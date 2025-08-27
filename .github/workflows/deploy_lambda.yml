@@ -7,13 +7,14 @@ on:
   pull_request:
     paths:
       - "**/*.py"
+      - "**/deploy_lambda.yml"
 
 permissions:
   id-token: write
   contents: read
 defaults:
   run:
-    working-directory: "./hello_lambda_py"
+    working-directory: "./hello_lambda"
 env:
   PYTHON_VERSION: 3.13
   function-name: hello_lambda_actions
@@ -42,7 +43,7 @@ jobs:
         uses: aws-actions/aws-lambda-deploy@v1.0.1
         with:
           function-name: ${{ env.function-name }}
-          code-artifacts-dir: ./hello_world
+          code-artifacts-dir: ./hello_lambda
           handler: app.lambda_handler
           runtime: python${{ env.PYTHON_VERSION }}
           role: ${{ env.lambda-role-arn }}
