@@ -4,9 +4,9 @@ import os
 
 def lambda_handler(event, context):
     # 環境変数を取得
-    environment = os.environ.get("ENVIRONMENT", "development")
-    log_level = os.environ.get("LOG_LEVEL", "debug")
-    app_name = os.environ.get("APP_NAME", "hello_lambda")
+    environment = os.environ.get("ENVIRONMENT")
+    log_level = os.environ.get("LOG_LEVEL")
+    app_name = os.environ.get("APP_NAME")
 
     return {
         "statusCode": 200,
