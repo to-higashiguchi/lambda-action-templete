@@ -1,20 +1,22 @@
-name: Deploy
+name: Deploy-Lambda-Python
 
 on:
   push:
     branches:
       - "main"
-  workflow_dispatch: {}
+  pull_request:
+    paths:
+      - "**/*.py"
 
 permissions:
   id-token: write
   contents: read
 defaults:
   run:
-    working-directory: "./hello_world"
+    working-directory: "./hello_lambda_py"
 env:
   PYTHON_VERSION: 3.13
-  function-name: sample-actions-deploy-function
+  function-name: hello_lambda_actions
   lambda-role-arn: ${{ secrets.LAMBDA_ROLE_ARN }}
 jobs:
   main:
@@ -40,7 +42,6 @@ jobs:
         uses: aws-actions/aws-lambda-deploy@v1.0.1
         with:
           function-name: ${{ env.function-name }}
-          # working-directoryからの相対ではなくリポジトリ直下基準で判定していたので明示的に指定
           code-artifacts-dir: ./hello_world
           handler: app.lambda_handler
           runtime: python${{ env.PYTHON_VERSION }}
