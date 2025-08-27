@@ -32,6 +32,31 @@ jobs:
       - name: Build
         run: pip install -r requirements.txt
 
+      - name: Load environment variables from .env file
+        id: load-env
+        run: |
+          if [ -f .env ]; then
+            echo "Loading environment variables from .env file"
+            # .envファイルから環境変数を読み取りJSON形式に変換
+            env_json="{"
+            while IFS='=' read -r key value || [ -n "$key" ]; do
+              # コメント行と空行をスキップ
+              if [[ "$key" =~ ^#.*$ ]] || [[ -z "$key" ]]; then
+                continue
+              fi
+              # 値をクォートで囲んでJSONに追加
+              if [ -n "$env_json" ] && [ "$env_json" != "{" ]; then
+                env_json="$env_json,"
+              fi
+              env_json="$env_json\"$key\":\"$value\""
+            done < .env
+            env_json="$env_json}"
+            echo "env-vars=$env_json" >> $GITHUB_OUTPUT
+          else
+            echo "No .env file found, using default environment variables"
+            echo 'env-vars={"ENVIRONMENT":"production","LOG_LEVEL":"info","PYTHON_VERSION":"${{ env.PYTHON_VERSION }}"}' >> $GITHUB_OUTPUT
+          fi
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -48,3 +73,4 @@ jobs:
           runtime: python${{ env.PYTHON_VERSION }}
           role: ${{ env.lambda-role-arn }}
           dry-run: false
+          environment-variables: ${{ steps.load-env.outputs.env-vars }}
