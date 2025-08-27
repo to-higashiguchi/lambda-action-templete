@@ -14,7 +14,7 @@ permissions:
   contents: read
 defaults:
   run:
-    working-directory: "./hello_lambda"
+    working-directory: "hello_lambda"
 env:
   PYTHON_VERSION: 3.13
   function-name: hello_lambda_actions
