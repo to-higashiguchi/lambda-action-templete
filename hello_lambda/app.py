@@ -12,7 +12,7 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps(
             {
-                "message": "hello",
+                "message": "hello_hoge",
                 "environment": environment,
                 "log_level": log_level,
                 "app_name": app_name,
