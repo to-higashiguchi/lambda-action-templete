@@ -32,51 +32,6 @@ jobs:
       - name: Build
         run: pip install -r requirements.txt
 
-      - name: Load environment variables from .env file
-        id: load-env
-        run: |
-          if [ -f .env ]; then
-            echo "Loading environment variables from .env file"
-            echo "=== .env file contents ==="
-            cat .env
-            echo "=========================="
-            
-            # .envファイルから環境変数を読み取りJSON形式に変換
-            env_json="{"
-            first=true
-            line_number=0
-            while IFS='=' read -r key value || [ -n "$key" ]; do
-              line_number=$((line_number + 1))
-              echo "Processing line $line_number: key='$key', value='$value'"
-              
-              # コメント行と空行をスキップ
-              if [[ "$key" =~ ^#.*$ ]] || [[ -z "$key" ]]; then
-                echo "  -> Skipping (comment or empty)"
-                continue
-              fi
-              
-              # 値からクォートを除去
-              value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
-              echo "  -> Adding: $key = $value"
-              
-              # JSONにキー・値のペアを追加
-              if [ "$first" = true ]; then
-                env_json="$env_json\"$key\":\"$value\""
-                first=false
-              else
-                env_json="$env_json,\"$key\":\"$value\""
-              fi
-            done < .env
-            env_json="$env_json}"
-            echo "Final JSON: $env_json"
-            echo "env-vars=$env_json" >> $GITHUB_OUTPUT
-          else
-            echo "No .env file found, using default environment variables"
-            default_env='{"ENVIRONMENT":"production","LOG_LEVEL":"info","PYTHON_VERSION":"'"${{ env.PYTHON_VERSION }}"'"}'
-            echo "Default environment variables: $default_env"
-            echo "env-vars=$default_env" >> $GITHUB_OUTPUT
-          fi
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -91,5 +46,6 @@ jobs:
           code-artifacts-dir: ./hello_lambda
           handler: app.lambda_handler
           runtime: python${{ env.PYTHON_VERSION }}
+          role: ${{ env.lambda-role-arn }}
           dry-run: false
-          environment: ${{ steps.load-env.outputs.env-vars }}
+          timeout: 30
