@@ -80,4 +80,6 @@ jobs:
           code-artifacts-dir: ./hello_lambda
           handler: app.lambda_handler
           runtime: python${{ env.PYTHON_VERSION }}
+          role: ${{ env.lambda-role-arn }}
           dry-run: false
+          environment: ${{ steps.load-env.outputs.env-vars }}
