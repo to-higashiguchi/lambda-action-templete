@@ -16,6 +16,7 @@ def lambda_handler(event, context):
                 "environment": environment,
                 "log_level": log_level,
                 "app_name": app_name,
+                "hoge": "hoge_value",
             }
         ),
     }
