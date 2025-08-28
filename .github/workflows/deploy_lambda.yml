@@ -48,3 +48,10 @@ jobs:
           runtime: python${{ env.PYTHON_VERSION }}
           role: ${{ env.lambda-role-arn }}
           timeout: 30
+          environment: |
+            {
+              "Variables": {
+                "YOUR_ENV_VAR_1": "<environment-val1>",
+                "YOUR_ENV_VAR_2": "<environment-val2>"
+              }
+            }
