@@ -37,16 +37,27 @@ jobs:
         run: |
           if [ -f .env ]; then
             echo "Loading environment variables from .env file"
+            echo "=== .env file contents ==="
+            cat .env
+            echo "=========================="
+            
             # .envファイルから環境変数を読み取りJSON形式に変換
             env_json="{"
             first=true
+            line_number=0
             while IFS='=' read -r key value || [ -n "$key" ]; do
+              line_number=$((line_number + 1))
+              echo "Processing line $line_number: key='$key', value='$value'"
+              
               # コメント行と空行をスキップ
               if [[ "$key" =~ ^#.*$ ]] || [[ -z "$key" ]]; then
+                echo "  -> Skipping (comment or empty)"
                 continue
               fi
+              
               # 値からクォートを除去
               value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
+              echo "  -> Adding: $key = $value"
               
               # JSONにキー・値のペアを追加
               if [ "$first" = true ]; then
@@ -57,7 +68,7 @@ jobs:
               fi
             done < .env
             env_json="$env_json}"
-            echo "Loaded environment variables: $env_json"
+            echo "Final JSON: $env_json"
             echo "env-vars=$env_json" >> $GITHUB_OUTPUT
           else
             echo "No .env file found, using default environment variables"
