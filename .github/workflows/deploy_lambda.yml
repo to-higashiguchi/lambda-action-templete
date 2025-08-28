@@ -50,8 +50,6 @@ jobs:
           timeout: 30
           environment: |
             {
-              "Variables": {
-                "YOUR_ENV_VAR_1": "<environment-val1>",
-                "YOUR_ENV_VAR_2": "<environment-val2>"
-              }
+              "YOUR_ENV_VAR_1": "<environment-val1>",
+              "YOUR_ENV_VAR_2": "<environment-val2>"
             }
