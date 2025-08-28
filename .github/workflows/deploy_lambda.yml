@@ -82,4 +82,4 @@ jobs:
           runtime: python${{ env.PYTHON_VERSION }}
           role: ${{ env.lambda-role-arn }}
           dry-run: false
-          environment-variables: ${{ steps.load-env.outputs.env-vars }}
+          #environment-variables: ${{ steps.load-env.outputs.env-vars }}
