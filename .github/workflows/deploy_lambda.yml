@@ -39,22 +39,31 @@ jobs:
             echo "Loading environment variables from .env file"
             # .envファイルから環境変数を読み取りJSON形式に変換
             env_json="{"
+            first=true
             while IFS='=' read -r key value || [ -n "$key" ]; do
               # コメント行と空行をスキップ
               if [[ "$key" =~ ^#.*$ ]] || [[ -z "$key" ]]; then
                 continue
               fi
-              # 値をクォートで囲んでJSONに追加
-              if [ -n "$env_json" ] && [ "$env_json" != "{" ]; then
-                env_json="$env_json,"
+              # 値からクォートを除去
+              value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
+              
+              # JSONにキー・値のペアを追加
+              if [ "$first" = true ]; then
+                env_json="$env_json\"$key\":\"$value\""
+                first=false
+              else
+                env_json="$env_json,\"$key\":\"$value\""
               fi
-              env_json="$env_json\"$key\":\"$value\""
             done < .env
             env_json="$env_json}"
+            echo "Loaded environment variables: $env_json"
             echo "env-vars=$env_json" >> $GITHUB_OUTPUT
           else
             echo "No .env file found, using default environment variables"
-            echo 'env-vars={"ENVIRONMENT":"production","LOG_LEVEL":"info","PYTHON_VERSION":"${{ env.PYTHON_VERSION }}"}' >> $GITHUB_OUTPUT
+            default_env='{"ENVIRONMENT":"production","LOG_LEVEL":"info","PYTHON_VERSION":"'"${{ env.PYTHON_VERSION }}"'"}'
+            echo "Default environment variables: $default_env"
+            echo "env-vars=$default_env" >> $GITHUB_OUTPUT
           fi
 
       - name: Configure AWS credentials
