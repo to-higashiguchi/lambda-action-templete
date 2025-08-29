@@ -18,6 +18,7 @@ defaults:
 env:
   PYTHON_VERSION: 3.13
   function-name: external_library_lambda
+  lambda-role-arn: ${{ secrets.LAMBDA_ROLE_ARN }} # 変更箇所
 jobs:
   main:
     runs-on: ubuntu-latest
