@@ -12,27 +12,34 @@ on:
 permissions:
   id-token: write
   contents: read
-defaults:
-  run:
-    working-directory: "external_library_lambda"
+
 env:
   PYTHON_VERSION: 3.13
-  function-name: external_library_lambda
   lambda-role-arn: ${{ secrets.LAMBDA_ROLE_ARN }}
+
 jobs:
-  main:
+  deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lambda-function:
+          - name: external_library_lambda
+            directory: external_library_lambda
+          - name: hello_lambda
+            directory: hello_lambda
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
+
       - name: Install dependencies to deployment package
+        working-directory: ${{ matrix.lambda-function.directory }}
         run: |
           pip install -r requirements.txt -t .
-          ls -la
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -44,8 +51,8 @@ jobs:
       - name: Deploy Lambda
         uses: aws-actions/aws-lambda-deploy@v1.0.1
         with:
-          function-name: ${{ env.function-name }}
-          code-artifacts-dir: ./external_library_lambda
+          function-name: ${{ matrix.lambda-function.name }}
+          code-artifacts-dir: ./${{ matrix.lambda-function.directory }}
           handler: app.lambda_handler
           runtime: python${{ env.PYTHON_VERSION }}
           role: ${{ env.lambda-role-arn }}
