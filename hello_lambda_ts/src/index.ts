@@ -1,13 +1,21 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
+import axios from 'axios';
+
+// PokeAPI のレスポンス型定義
+interface PokemonResponse {
+  name: string;
+  id: number;
+}
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message: 'hello from TypeScript!',
-    }),
-  };
+    const response = await axios.get<PokemonResponse>('https://pokeapi.co/api/v2/pokemon/25');
+    return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+        message: response.data.name,
+        }),
+    };
 };
 
 // スクリプトが直接実行された場合にテストコードを呼び出す

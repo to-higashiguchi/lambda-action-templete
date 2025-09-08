@@ -10,9 +10,13 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.138",
+    "@types/axios": "^0.9.36",
     "@types/node": "^20.12.12",
     "esbuild": "^0.25.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "axios": "^1.11.0"
   }
 }
