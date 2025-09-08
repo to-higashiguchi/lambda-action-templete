@@ -1,13 +1,14 @@
 name: Deploy-Lambda-Python
 
 on:
-  push:
-    branches:
-      - "main"
-  pull_request:
-    paths:
-      - "**/*.py"
-      - "**/deploy_lambda.yml"
+  # push:
+  #   branches:
+  #     - "main"
+  # pull_request:
+  #   paths:
+  #     - "**/*.py"
+  #     - "**/deploy_lambda.yml"
+  workflow_dispatch:
 
 permissions:
   id-token: write

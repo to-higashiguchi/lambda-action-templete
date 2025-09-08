@@ -1,0 +1,58 @@
+name: Deploy-Lambda-TypeScript
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    paths:
+      - "hello_lambda_ts/**"
+      - ".github/workflows/deploy_lambda.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+defaults:
+  run:
+    working-directory: "hello_lambda_ts"
+
+env:
+  NODE_VERSION: 20.x
+  function-name: hello_lambda_ts_actions
+  lambda-role-arn: ${{ secrets.LAMBDA_ROLE_ARN }}
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ env.NODE_VERSION }}"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: Deploy Lambda
+        uses: aws-actions/aws-lambda-deploy@v1.0.1
+        with:
+          function-name: ${{ env.function-name }}
+          code-artifacts-dir: ./hello_lambda_ts/dist
+          handler: index.handler
+          runtime: nodejs${{ env.NODE_VERSION }}
+          role: ${{ env.lambda-role-arn }}
+          timeout: 30
