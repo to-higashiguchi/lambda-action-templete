@@ -9,3 +9,13 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     }),
   };
 };
+
+// スクリプトが直接実行された場合にテストコードを呼び出す
+if (require.main === module) {
+  console.log("--- Running Local Test ---");
+  // @ts-ignore
+  handler({}, {}).then(result => {
+    console.log(JSON.parse(result.body));
+  });
+  console.log("--- End of Local Test ---");
+}
